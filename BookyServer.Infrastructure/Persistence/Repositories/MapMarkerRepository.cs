@@ -7,15 +7,19 @@ namespace BookyServer.Infrastructure.Persistence.Repositories;
 
 internal sealed class MapMarkerRepository(BookyServerDbContext db) : IMapMarkerRepository
 {
-    public async Task<IReadOnlyList<MapMarker>> GetPublishedAsync(CancellationToken cancellationToken) =>
-        await db.MapMarkers.AsNoTracking()
+    private readonly BookyServerDbContext _db = db ?? throw new ArgumentNullException(nameof(db));
+
+    public async Task<IReadOnlyList<MapMarker>> GetPublishedAsync(CancellationToken cancellationToken)
+    {
+        return await this._db.MapMarkers.AsNoTracking()
             .Where(marker => marker.IsPublished)
             .OrderBy(marker => marker.Name)
             .ToListAsync(cancellationToken);
+    }
 
     public async Task AddAsync(MapMarker marker, CancellationToken cancellationToken)
     {
-        db.MapMarkers.Add(marker);
-        await db.SaveChangesAsync(cancellationToken);
+        this._db.MapMarkers.Add(marker);
+        await this._db.SaveChangesAsync(cancellationToken);
     }
 }

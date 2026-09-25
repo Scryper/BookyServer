@@ -1,54 +1,56 @@
-﻿namespace BookyServer.Api.Middlewares;
+namespace BookyServer.Api.Middlewares;
 
 /// <summary>
-/// Middleware that protects from XSS attacks.
+/// Middleware that adds response-security headers.
 /// </summary>
-public class CspMiddleware
+public sealed class CspMiddleware
 {
     private readonly RequestDelegate _next;
 
     /// <summary>
-    /// Initializes a new instance of <see cref="AntiXssMiddleware"/>.
+    /// Initializes a new instance of <see cref="CspMiddleware"/>.
     /// </summary>
-    /// <param name="next">The next delegate.</param>
-    /// <exception cref="ArgumentNullException">Exception thrown if DI breaks.</exception>
+    /// <param name="next">The next request delegate.</param>
+    /// <exception cref="ArgumentNullException">Thrown when the dependency is null.</exception>
     public CspMiddleware(RequestDelegate next)
     {
         this._next = next ?? throw new ArgumentNullException(nameof(next));
     }
 
-    public async Task Invoke(HttpContext context)
+    public async Task InvokeAsync(HttpContext context)
     {
-		// Remove
-		context.Response.Headers.Remove("X-Powered-By");
-		context.Response.Headers.Remove("Server");
+        context.Response.Headers.Remove(Constants.Headers.PoweredBy);
+        context.Response.Headers.Remove(Constants.Headers.Server);
 
-		// Add
-		if (!context.Response.Headers.ContainsKey("Content-Security-Policy"))
-		{
-			context.Response.Headers.Append("Content-Security-Policy", "default-src 'self'");
-		}
+        if (!context.Response.Headers.ContainsKey(Constants.Headers.ContentSecurityPolicy))
+        {
+            context.Response.Headers.Append(
+                Constants.Headers.ContentSecurityPolicy,
+                Constants.Headers.ContentSecurityPolicyValue);
+        }
 
-		if (!context.Response.Headers.ContainsKey("X-Frame-Options"))
-		{
-			context.Response.Headers.Append("X-Frame-Options", "DENY");
-		}
+        if (!context.Response.Headers.ContainsKey(Constants.Headers.FrameOptions))
+        {
+            context.Response.Headers.Append(Constants.Headers.FrameOptions, Constants.Headers.FrameOptionsValue);
+        }
 
-		if (!context.Response.Headers.ContainsKey("X-XSS-Protection"))
-		{
-			context.Response.Headers.Append("X-XSS-Protection", "1; mode=block");
-		}
+        if (!context.Response.Headers.ContainsKey(Constants.Headers.XssProtection))
+        {
+            context.Response.Headers.Append(Constants.Headers.XssProtection, Constants.Headers.XssProtectionValue);
+        }
 
-		if (!context.Response.Headers.ContainsKey("X-Content-Type-Options"))
-		{
-			context.Response.Headers.Append("X-Content-Type-Options", "nosniff");
-		}
+        if (!context.Response.Headers.ContainsKey(Constants.Headers.ContentTypeOptions))
+        {
+            context.Response.Headers.Append(Constants.Headers.ContentTypeOptions, Constants.Headers.ContentTypeOptionsValue);
+        }
 
-		if (!context.Response.Headers.ContainsKey("Strict-Transport-Security"))
-		{
-			context.Response.Headers.Append("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
-		}
+        if (!context.Response.Headers.ContainsKey(Constants.Headers.StrictTransportSecurity))
+        {
+            context.Response.Headers.Append(
+                Constants.Headers.StrictTransportSecurity,
+                Constants.Headers.StrictTransportSecurityValue);
+        }
 
-		await this._next(context);
+        await this._next(context);
     }
 }

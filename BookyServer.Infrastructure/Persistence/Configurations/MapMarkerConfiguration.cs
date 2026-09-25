@@ -1,4 +1,5 @@
 using BookyServer.Domain.Entities;
+using BookyServer.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -8,10 +9,10 @@ internal sealed class MapMarkerConfiguration : IEntityTypeConfiguration<MapMarke
 {
     public void Configure(EntityTypeBuilder<MapMarker> builder)
     {
-        builder.ToTable("MapMarkers", table =>
+        builder.ToTable(Constants.Database.MapMarkersTable, table =>
         {
-            table.HasCheckConstraint("CK_MapMarkers_Latitude", "[Latitude] >= -90 AND [Latitude] <= 90");
-            table.HasCheckConstraint("CK_MapMarkers_Longitude", "[Longitude] >= -180 AND [Longitude] <= 180");
+            table.HasCheckConstraint(Constants.Database.MapMarkerLatitudeConstraint, Constants.Database.MapMarkerLatitudePredicate);
+            table.HasCheckConstraint(Constants.Database.MapMarkerLongitudeConstraint, Constants.Database.MapMarkerLongitudePredicate);
         });
         builder.HasKey(marker => marker.Id);
         builder.Property(marker => marker.Name).HasMaxLength(160).IsRequired();

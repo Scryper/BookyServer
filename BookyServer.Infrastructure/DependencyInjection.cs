@@ -12,8 +12,8 @@ public static class DependencyInjection
     public static IServiceCollection AddBookyInfrastructure(
         this IServiceCollection services, IConfiguration configuration)
     {
-        var connectionString = configuration.GetConnectionString("BookyDatabase")
-            ?? throw new InvalidOperationException("La configuration ConnectionStrings:BookyDatabase est manquante.");
+        var connectionString = configuration.GetConnectionString(Constants.Configuration.BookyDatabaseConnectionString)
+            ?? throw new InvalidOperationException(Constants.Configuration.MissingBookyDatabaseConnectionString);
 
         services.AddDbContext<BookyServerDbContext>(options => options.UseSqlServer(
             connectionString,

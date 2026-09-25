@@ -1,4 +1,5 @@
 using BookyServer.Domain.Entities;
+using BookyServer.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -8,7 +9,7 @@ internal sealed class ProfilePhotoConfiguration : IEntityTypeConfiguration<Profi
 {
     public void Configure(EntityTypeBuilder<ProfilePhoto> builder)
     {
-        builder.ToTable("ProfilePhotos");
+        builder.ToTable(Constants.Database.ProfilePhotosTable);
         builder.HasKey(photo => photo.Id);
         builder.Property(photo => photo.Category).HasConversion<string>().HasMaxLength(24);
         builder.Property(photo => photo.ObjectKey).HasMaxLength(512).IsRequired();

@@ -1,19 +1,17 @@
 ﻿using System.Net;
 using System.Text;
 using BookyServer.Api.Helpers;
-using Institut.Helpers;
-using Institut.Helpers.Models;
+using BookyServer.Api.Helpers.Models;
 
 namespace BookyServer.Api.Middlewares;
 
 /// <summary>
 /// Middleware that protects from XSS attacks.
 /// </summary>
-public class AntiXssMiddleware
+public sealed class AntiXssMiddleware
 {
     private readonly RequestDelegate _next;
-    private ErrorResponse? _error;
-    private const int StatusCode = (int)HttpStatusCode.BadRequest;
+    private const int BadRequestStatusCode = (int)HttpStatusCode.BadRequest;
 
     /// <summary>
     /// Initializes a new instance of <see cref="AntiXssMiddleware"/>.
@@ -25,7 +23,7 @@ public class AntiXssMiddleware
         this._next = next ?? throw new ArgumentNullException(nameof(next));
     }
 
-    public async Task Invoke(HttpContext context)
+    public async Task InvokeAsync(HttpContext context)
     {
         // Check XSS in URL
         if (!string.IsNullOrWhiteSpace(context.Request.Path.Value))
@@ -34,7 +32,7 @@ public class AntiXssMiddleware
 
             if (CrossSiteScriptingValidation.IsDangerousString(url, out _))
             {
-                await this.RespondWithAnError(context).ConfigureAwait(false);
+                await this.RespondWithAnErrorAsync(context).ConfigureAwait(false);
                 return;
             }
         }
@@ -46,7 +44,7 @@ public class AntiXssMiddleware
 
             if (CrossSiteScriptingValidation.IsDangerousString(queryString, out _))
             {
-                await this.RespondWithAnError(context).ConfigureAwait(false);
+                await this.RespondWithAnErrorAsync(context).ConfigureAwait(false);
                 return;
             }
         }
@@ -55,13 +53,15 @@ public class AntiXssMiddleware
         var originalBody = context.Request.Body;
         try
         {
-            var content = await ReadRequestBody(context);
+            var content = await ReadRequestBodyAsync(context);
 
-            if (!content.Contains("Content-Disposition: form-data") && CrossSiteScriptingValidation.IsDangerousString(content, out _)) 
+            if (!content.Contains(Constants.Requests.FormDataContentDisposition, StringComparison.Ordinal) &&
+                CrossSiteScriptingValidation.IsDangerousString(content, out _))
             {
-                await this.RespondWithAnError(context);
+                await this.RespondWithAnErrorAsync(context);
                 return;
             }
+
             await this._next(context);
         }
         finally
@@ -70,7 +70,7 @@ public class AntiXssMiddleware
         }
     }
 
-    private static async Task<string> ReadRequestBody(HttpContext context)
+    private static async Task<string> ReadRequestBodyAsync(HttpContext context)
     {
         var buffer = new MemoryStream();
         await context.Request.Body.CopyToAsync(buffer);
@@ -85,19 +85,19 @@ public class AntiXssMiddleware
         return requestContent;
     }
 
-    private async Task RespondWithAnError(HttpContext context)
+    private async Task RespondWithAnErrorAsync(HttpContext context)
     {
         context.Response.Clear();
         context.Response.Headers.AddHeaders();
-        context.Response.ContentType = "application/json; charset=utf-8";
-        context.Response.StatusCode = StatusCode;
+        context.Response.ContentType = Constants.ResponseContentTypes.Utf8Json;
+        context.Response.StatusCode = BadRequestStatusCode;
 
-        this._error ??= new ErrorResponse
+        var error = new ErrorResponse
         {
-            Description = "Error from AntiXssMiddleware",
+            Description = Constants.Errors.AntiXss,
             ErrorCode = 500
         };
 
-        await context.Response.WriteAsync(this._error.ToJson());
+        await context.Response.WriteAsync(error.ToJson());
     }
 }

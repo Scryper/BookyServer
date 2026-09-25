@@ -5,7 +5,7 @@ namespace BookyServer.Application.Mapping;
 
 internal static class ProfileMapper
 {
-    public static ProfileDto ToDto(Profile profile)
+    public static ProfileDto Map(Profile profile)
     {
         var today = DateOnly.FromDateTime(DateTime.UtcNow);
         var age = today.Year - profile.BirthDate.Year;
@@ -29,23 +29,22 @@ internal static class ProfileMapper
             profile.Interests.Where(interest => !interest.IsReadingInterest).OrderBy(interest => interest.Name)
                 .Select(interest => interest.Name).ToArray(),
             profile.Books.OrderBy(book => book.Book.Title)
-                .Select(book => new ProfileBookDto(
-                    book.BookId, book.Book.Title, book.Book.Author, ToRatingCode(book.Rating), book.ReadAt))
+                .Select(ProfileBookMapper.Map)
                 .ToArray(),
             profile.Photos.OrderBy(photo => photo.Category).ThenBy(photo => photo.SortOrder)
-                .Select(photo => new ProfilePhotoDto(
-                    photo.Id, photo.Category.ToString(), photo.SortOrder)).ToArray());
+                .Select(ProfilePhotoMapper.Map)
+                .ToArray());
     }
 
-    public static ProfileBookDto ToDto(ProfileBook book) => new(
-        book.BookId, book.Book.Title, book.Book.Author, ToRatingCode(book.Rating), book.ReadAt);
-
-    private static string ToRatingCode(BookRating rating) => rating switch
+    internal static string ToRatingCode(BookRating rating)
     {
-        BookRating.Detested => "deteste",
-        BookRating.Disliked => "pas_aime",
-        BookRating.Liked => "aime",
-        BookRating.Favorite => "coup_de_coeur",
-        _ => throw new ArgumentOutOfRangeException(nameof(rating), rating, "Avis de lecture inconnu.")
-    };
+        return rating switch
+        {
+            BookRating.Detested => Constants.Ratings.Detested,
+            BookRating.Disliked => Constants.Ratings.Disliked,
+            BookRating.Liked => Constants.Ratings.Liked,
+            BookRating.Favorite => Constants.Ratings.Favorite,
+            _ => throw new ArgumentOutOfRangeException(nameof(rating), rating, Constants.Errors.UnknownBookRating)
+        };
+    }
 }

@@ -8,22 +8,24 @@ namespace BookyServer.Application.Services;
 
 public sealed class ProfileService(IProfileRepository profiles) : IProfileService
 {
+    private readonly IProfileRepository _profiles = profiles ?? throw new ArgumentNullException(nameof(profiles));
+
     public async Task<ProfileDto?> GetMineAsync(Guid userId, CancellationToken cancellationToken)
     {
-        var profile = await profiles.GetByUserIdAsync(userId, cancellationToken);
-        return profile is null ? null : ProfileMapper.ToDto(profile);
+        var profile = await this._profiles.GetByUserIdAsync(userId, cancellationToken);
+        return profile is null ? null : ProfileMapper.Map(profile);
     }
 
     public async Task<ProfileDto?> GetByIdAsync(
         Guid profileId, Guid? viewerUserId, CancellationToken cancellationToken)
     {
-        var profile = await profiles.GetByIdAsync(profileId, cancellationToken);
+        var profile = await this._profiles.GetByIdAsync(profileId, cancellationToken);
         if (profile is null || (!profile.IsPublic && profile.UserId != viewerUserId))
         {
             return null;
         }
 
-        return ProfileMapper.ToDto(profile);
+        return ProfileMapper.Map(profile);
     }
 
     public async Task<ProfileDto> UpdateMineAsync(
@@ -31,21 +33,21 @@ public sealed class ProfileService(IProfileRepository profiles) : IProfileServic
     {
         if (string.IsNullOrWhiteSpace(request.FirstName) || request.FirstName.Trim().Length > 80)
         {
-            throw new ArgumentException("Le prénom est obligatoire et doit faire au plus 80 caractères.");
+            throw new ArgumentException(Constants.Errors.InvalidProfileFirstName);
         }
 
         var today = DateOnly.FromDateTime(DateTime.UtcNow);
         if (request.BirthDate > today || request.BirthDate < today.AddYears(-120))
         {
-            throw new ArgumentException("La date de naissance est invalide.");
+            throw new ArgumentException(Constants.Errors.InvalidProfileBirthDate);
         }
 
         if (request.ReadingInterests.Count + request.OtherInterests.Count > 20)
         {
-            throw new ArgumentException("Un profil peut contenir au maximum 20 centres d'intérêt.");
+            throw new ArgumentException(Constants.Errors.TooManyProfileInterests);
         }
 
-        var profile = await profiles.GetByUserIdAsync(userId, cancellationToken)
+        var profile = await this._profiles.GetByUserIdAsync(userId, cancellationToken)
             ?? new Profile { Id = Guid.NewGuid(), UserId = userId };
 
         profile.FirstName = request.FirstName.Trim();
@@ -62,17 +64,15 @@ public sealed class ProfileService(IProfileRepository profiles) : IProfileServic
         AddInterests(profile, request.ReadingInterests, isReadingInterest: true);
         AddInterests(profile, request.OtherInterests, isReadingInterest: false);
 
-        await profiles.SaveAsync(profile, cancellationToken);
-        return ProfileMapper.ToDto(profile);
+        await this._profiles.SaveAsync(profile, cancellationToken);
+        return ProfileMapper.Map(profile);
     }
 
     public async Task<IReadOnlyList<BookCatalogDto>> SearchBooksAsync(
         string? query, int limit, CancellationToken cancellationToken)
     {
-        var books = await profiles.SearchBooksAsync(query, Math.Clamp(limit, 1, 100), cancellationToken);
-        return books.Select(book => new BookCatalogDto(
-            book.Id, book.Title, book.Author, book.PublicationYear, book.Genre,
-            book.Synopsis, book.Isbn13, book.CoverUrl)).ToArray();
+        var books = await this._profiles.SearchBooksAsync(query, Math.Clamp(limit, 1, 100), cancellationToken);
+        return books.Select(BookCatalogMapper.Map).ToArray();
     }
 
     public async Task<ProfileBookDto?> RateBookAsync(
@@ -80,16 +80,16 @@ public sealed class ProfileService(IProfileRepository profiles) : IProfileServic
     {
         var rating = request.Rating.Trim().ToLowerInvariant() switch
         {
-            "deteste" => BookRating.Detested,
-            "pas_aime" => BookRating.Disliked,
-            "aime" => BookRating.Liked,
-            "coup_de_coeur" => BookRating.Favorite,
-            _ => throw new ArgumentException("Avis attendu : deteste, pas_aime, aime ou coup_de_coeur.")
+            Constants.Ratings.Detested => BookRating.Detested,
+            Constants.Ratings.Disliked => BookRating.Disliked,
+            Constants.Ratings.Liked => BookRating.Liked,
+            Constants.Ratings.Favorite => BookRating.Favorite,
+            _ => throw new ArgumentException(Constants.Errors.InvalidBookRating)
         };
 
-        var result = await profiles.SetBookRatingAsync(
+        var result = await this._profiles.SetBookRatingAsync(
             userId, bookId, rating, request.ReadAt, cancellationToken);
-        return result is null ? null : ProfileMapper.ToDto(result);
+        return result is null ? null : ProfileBookMapper.Map(result);
     }
 
     private static void AddInterests(Profile profile, IReadOnlyList<string> values, bool isReadingInterest)
@@ -99,7 +99,7 @@ public sealed class ProfileService(IProfileRepository profiles) : IProfileServic
         {
             if (item.Length > 60)
             {
-                throw new ArgumentException("Chaque centre d'intérêt doit faire au plus 60 caractères.");
+                throw new ArgumentException(Constants.Errors.InvalidProfileInterest);
             }
 
             profile.Interests.Add(new ProfileInterest

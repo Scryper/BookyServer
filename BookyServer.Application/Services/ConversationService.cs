@@ -8,23 +8,26 @@ namespace BookyServer.Application.Services;
 
 public sealed class ConversationService(IConversationRepository conversations) : IConversationService
 {
+    private readonly IConversationRepository _conversations =
+        conversations ?? throw new ArgumentNullException(nameof(conversations));
+
     public async Task<IReadOnlyList<ConversationMessageDto>?> GetMessagesAsync(
         Guid groupId, Guid userId, int limit, CancellationToken cancellationToken)
     {
-        if (!await conversations.IsMemberAsync(groupId, userId, cancellationToken))
+        if (!await this._conversations.IsMemberAsync(groupId, userId, cancellationToken))
         {
             return null;
         }
 
-        var messages = await conversations.GetMessagesAsync(
+        var messages = await this._conversations.GetMessagesAsync(
             groupId, Math.Clamp(limit, 1, 100), cancellationToken);
-        return messages.Select(ConversationMessageMapper.ToDto).ToArray();
+        return messages.Select(ConversationMessageMapper.Map).ToArray();
     }
 
     public async Task<ConversationMessageDto?> SendAsync(
         Guid groupId, Guid userId, string text, CancellationToken cancellationToken)
     {
-        if (!await conversations.IsMemberAsync(groupId, userId, cancellationToken))
+        if (!await this._conversations.IsMemberAsync(groupId, userId, cancellationToken))
         {
             return null;
         }
@@ -32,7 +35,7 @@ public sealed class ConversationService(IConversationRepository conversations) :
         var normalized = text.Trim();
         if (normalized.Length is 0 or > 3000)
         {
-            throw new ArgumentException("Un message doit contenir de 1 à 3000 caractères.");
+            throw new ArgumentException(Constants.Errors.InvalidConversationMessage);
         }
 
         var message = new ConversationMessage
@@ -43,7 +46,7 @@ public sealed class ConversationService(IConversationRepository conversations) :
             Text = normalized,
             CreatedAt = DateTimeOffset.UtcNow
         };
-        await conversations.AddMessageAsync(message, cancellationToken);
-        return ConversationMessageMapper.ToDto(message);
+        await this._conversations.AddMessageAsync(message, cancellationToken);
+        return ConversationMessageMapper.Map(message);
     }
 }

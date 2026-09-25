@@ -1,4 +1,5 @@
 using BookyServer.Domain.Entities;
+using BookyServer.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -8,7 +9,7 @@ internal sealed class BookConfiguration : IEntityTypeConfiguration<Book>
 {
     public void Configure(EntityTypeBuilder<Book> builder)
     {
-        builder.ToTable("Books");
+        builder.ToTable(Constants.Database.BooksTable);
         builder.HasKey(book => book.Id);
         builder.Property(book => book.Title).HasMaxLength(300).IsRequired();
         builder.Property(book => book.Author).HasMaxLength(240).IsRequired();
@@ -18,8 +19,8 @@ internal sealed class BookConfiguration : IEntityTypeConfiguration<Book>
         builder.Property(book => book.CoverUrl).HasMaxLength(2048);
         builder.Property(book => book.Source).HasMaxLength(80);
         builder.Property(book => book.ExternalId).HasMaxLength(200);
-        builder.HasIndex(book => book.Isbn13).IsUnique().HasFilter("[Isbn13] IS NOT NULL");
+        builder.HasIndex(book => book.Isbn13).IsUnique().HasFilter(Constants.Database.BookIsbnFilter);
         builder.HasIndex(book => new { book.Source, book.ExternalId }).IsUnique()
-            .HasFilter("[Source] IS NOT NULL AND [ExternalId] IS NOT NULL");
+            .HasFilter(Constants.Database.BookSourceAndExternalIdFilter);
     }
 }

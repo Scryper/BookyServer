@@ -1,4 +1,5 @@
 using BookyServer.Domain.Entities;
+using BookyServer.Infrastructure;
 using BookyServer.Infrastructure.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -9,8 +10,9 @@ internal sealed class ReaderGroupConfiguration : IEntityTypeConfiguration<Reader
 {
     public void Configure(EntityTypeBuilder<ReaderGroup> builder)
     {
-        builder.ToTable("ReaderGroups", table => table.HasCheckConstraint(
-            "CK_ReaderGroups_MaxMembers", "[MaxMembers] >= 1 AND [MaxMembers] <= 8"));
+        builder.ToTable(Constants.Database.ReaderGroupsTable, table => table.HasCheckConstraint(
+            Constants.Database.ReaderGroupMaximumMembersConstraint,
+            Constants.Database.ReaderGroupMaximumMembersPredicate));
         builder.HasKey(group => group.Id);
         builder.Property(group => group.Name).HasMaxLength(120).IsRequired();
         builder.Property(group => group.Topic).HasMaxLength(160).IsRequired();

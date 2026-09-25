@@ -1,4 +1,5 @@
 using BookyServer.Domain.Entities;
+using BookyServer.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -8,10 +9,10 @@ internal sealed class ProfileBookConfiguration : IEntityTypeConfiguration<Profil
 {
     public void Configure(EntityTypeBuilder<ProfileBook> builder)
     {
-        builder.ToTable("ProfileBooks");
+        builder.ToTable(Constants.Database.ProfileBooksTable);
         builder.HasKey(item => new { item.ProfileId, item.BookId });
         builder.Property(item => item.Rating).HasConversion<string>().HasMaxLength(24);
-        builder.Property(item => item.ReadAt).HasColumnType("date");
+        builder.Property(item => item.ReadAt).HasColumnType(Constants.Database.DateColumnType);
         builder.HasOne(item => item.Book).WithMany(book => book.Profiles).HasForeignKey(item => item.BookId)
             .OnDelete(DeleteBehavior.Restrict);
     }

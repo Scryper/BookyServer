@@ -4,41 +4,48 @@ namespace BookyServer.Api.Helpers;
 
 public static class CrossSiteScriptingValidation
 {
-	private static readonly char[] StartingChars = { '<', '&' };
+    private static readonly char[] StartingChars = ['<', '&'];
 
     public static bool IsDangerousString(string s, out int matchIndex)
     {
         matchIndex = 0;
 
-        for (var i = 0; ;)
+        var index = 0;
+        while (true)
         {
+            var match = s.IndexOfAny(StartingChars, index);
 
-            // Look for the start of one of our patterns 
-            var n = s.IndexOfAny(StartingChars, i);
-
-            // If not found, the string is safe
-            if (n < 0) return false;
-
-            // If it's the last char, it's safe 
-            if (n == s.Length - 1) return false;
-
-            matchIndex = n;
-
-            switch (s[n])
+            if (match < 0)
             {
-                case '<':
-                    // If the < is followed by a letter or '!', it's unsafe (looks like a tag or HTML comment)
-                    if (IsAtoZ(s[n + 1]) || s[n + 1] == '!' || s[n + 1] == '/' || s[n + 1] == '?') return true;
-                    break;
-                case '&':
-                    // If the & is followed by a #, it's unsafe (e.g. S) 
-                    if (s[n + 1] == '#') return true;
-                    break;
-
+                return false;
             }
 
-            // Continue searching
-            i = n + 1;
+            if (match == s.Length - 1)
+            {
+                return false;
+            }
+
+            matchIndex = match;
+
+            switch (s[match])
+            {
+                case '<':
+                    if (IsAtoZ(s[match + 1]) || s[match + 1] == '!' || s[match + 1] == '/' || s[match + 1] == '?')
+                    {
+                        return true;
+                    }
+
+                    break;
+                case '&':
+                    if (s[match + 1] == '#')
+                    {
+                        return true;
+                    }
+
+                    break;
+            }
+
+            index = match + 1;
         }
     }
 
@@ -49,9 +56,9 @@ public static class CrossSiteScriptingValidation
 
     public static void AddHeaders(this IHeaderDictionary headers)
     {
-        if (headers["P3P"].IsNullOrEmpty())
+        if (headers[Constants.Headers.P3P].IsNullOrEmpty())
         {
-            headers.Append("P3P", "CP=\"IDC DSP COR ADM DEVi TAIi PSA PSD IVAi IVDi CONi HIS OUR IND CNT\"");
+            headers.Append(Constants.Headers.P3P, Constants.Headers.P3PValue);
         }
     }
 

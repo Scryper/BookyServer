@@ -1,3 +1,4 @@
+using ApiConstants = BookyServer.Api.Constants;
 using BookyServer.Api.Middlewares;
 using BookyServer.Application;
 using BookyServer.Infrastructure;
@@ -21,22 +22,25 @@ builder.Services.AddIdentityApiEndpoints<BookyUser>(options =>
         options.Password.RequireDigit = true;
         options.Password.RequireUppercase = true;
         options.Password.RequireNonAlphanumeric = true;
-        options.SignIn.RequireConfirmedEmail = builder.Configuration.GetValue("Authentication:RequireConfirmedEmail", false);
+        options.SignIn.RequireConfirmedEmail = builder.Configuration.GetValue(
+            ApiConstants.Configuration.RequireConfirmedEmail,
+            false);
     })
     .AddEntityFrameworkStores<BookyServerDbContext>();
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
-    options.Cookie.Name = "__Host-BookyServer.Auth";
+    options.Cookie.Name = ApiConstants.Cookies.AuthenticationName;
     options.Cookie.HttpOnly = true;
     options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
     options.Cookie.SameSite = SameSiteMode.Strict;
 });
 
 builder.Services.AddAuthorizationBuilder()
-    .AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
+    .AddPolicy(ApiConstants.Authorization.AdministratorPolicy, policy =>
+        policy.RequireRole(ApiConstants.Authorization.AdministratorRole));
 
-var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
+var allowedOrigins = builder.Configuration.GetSection(ApiConstants.Configuration.AllowedCorsOrigins).Get<string[]>() ?? [];
 if (allowedOrigins.Length > 0)
 {
     builder.Services.AddCors(options => options.AddDefaultPolicy(policy =>
@@ -50,7 +54,7 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
     app.UseSwaggerUI(options =>
     {
-        options.SwaggerEndpoint("/openapi/v1.json", "BookyServer API v1");
+        options.SwaggerEndpoint(ApiConstants.OpenApi.Endpoint, ApiConstants.OpenApi.Title);
     });
 }
 else
@@ -73,18 +77,24 @@ app.UseAuthorization();
 app.UseMiddleware<ExceptionHandlerMiddleware>();
 app.UseMiddleware<AntiXssMiddleware>();
 
-app.MapGroup("/api/v1/auth").MapIdentityApi<BookyUser>();
+app.MapGroup(ApiConstants.Routes.Authentication).MapIdentityApi<BookyUser>();
 app.MapControllers();
 
-app.MapGet("/health/live", () => Results.Ok(new { status = "live" }))
+app.MapGet(ApiConstants.Routes.HealthLive, () =>
+    {
+        return Results.Ok(new { status = ApiConstants.Statuses.Live });
+    })
     .AllowAnonymous();
 
-app.MapGet("/health/ready", async (BookyServerDbContext db, CancellationToken cancellationToken) =>
-{
-    var canConnect = await db.Database.CanConnectAsync(cancellationToken);
-    return canConnect
-        ? Results.Ok(new { status = "ready" })
-        : Results.StatusCode(StatusCodes.Status503ServiceUnavailable);
-}).AllowAnonymous();
+app.MapGet(
+        ApiConstants.Routes.HealthReady,
+        async (BookyServerDbContext db, CancellationToken cancellationToken) =>
+        {
+            var canConnect = await db.Database.CanConnectAsync(cancellationToken);
+            return canConnect
+                ? Results.Ok(new { status = ApiConstants.Statuses.Ready })
+                : Results.StatusCode(StatusCodes.Status503ServiceUnavailable);
+        })
+    .AllowAnonymous();
 
 app.Run();

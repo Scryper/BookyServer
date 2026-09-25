@@ -1,4 +1,5 @@
 using BookyServer.Domain.Entities;
+using BookyServer.Infrastructure;
 
 namespace BookyServer.Infrastructure.Persistence;
 
@@ -24,14 +25,17 @@ internal static class BookCatalogSeed
     ];
 
     private static Book Book(
-        string id, string title, string author, int year, string genre, string synopsis) => new()
+        string id, string title, string author, int year, string genre, string synopsis)
     {
-        Id = Guid.Parse(id),
-        Title = title,
-        Author = author,
-        PublicationYear = year,
-        Genre = genre,
-        Synopsis = synopsis,
-        Source = "Booky initial catalog"
-    };
+        return new Book
+        {
+            Id = Guid.Parse(id),
+            Title = title,
+            Author = author,
+            PublicationYear = year,
+            Genre = genre,
+            Synopsis = synopsis,
+            Source = Constants.SeedData.BookCatalogSource
+        };
+    }
 }

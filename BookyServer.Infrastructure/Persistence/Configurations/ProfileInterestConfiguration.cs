@@ -1,4 +1,5 @@
 using BookyServer.Domain.Entities;
+using BookyServer.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -8,7 +9,7 @@ internal sealed class ProfileInterestConfiguration : IEntityTypeConfiguration<Pr
 {
     public void Configure(EntityTypeBuilder<ProfileInterest> builder)
     {
-        builder.ToTable("ProfileInterests");
+        builder.ToTable(Constants.Database.ProfileInterestsTable);
         builder.HasKey(interest => interest.Id);
         builder.Property(interest => interest.Name).HasMaxLength(60).IsRequired();
         builder.HasIndex(interest => new { interest.ProfileId, interest.Name, interest.IsReadingInterest }).IsUnique();

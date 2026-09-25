@@ -1,7 +1,7 @@
-﻿namespace Institut.Helpers.Models;
+namespace BookyServer.Api.Helpers.Models;
 
-public class ErrorResponse
+public sealed class ErrorResponse
 {
-	public int ErrorCode { get; set; }
-	public string Description { get; set; } = string.Empty;
+    public int ErrorCode { get; set; }
+    public string Description { get; set; } = string.Empty;
 }
