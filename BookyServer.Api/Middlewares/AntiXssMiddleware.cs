@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Text;
+
 using BookyServer.Api.Helpers;
 using BookyServer.Api.Helpers.Models;
 
@@ -8,20 +9,10 @@ namespace BookyServer.Api.Middlewares;
 /// <summary>
 /// Middleware that protects from XSS attacks.
 /// </summary>
-public sealed class AntiXssMiddleware
+public sealed class AntiXssMiddleware(RequestDelegate next)
 {
-    private readonly RequestDelegate _next;
+    private readonly RequestDelegate _next = next ?? throw new ArgumentNullException(nameof(next));
     private const int BadRequestStatusCode = (int)HttpStatusCode.BadRequest;
-
-    /// <summary>
-    /// Initializes a new instance of <see cref="AntiXssMiddleware"/>.
-    /// </summary>
-    /// <param name="next">The next delegate.</param>
-    /// <exception cref="ArgumentNullException">Exception thrown if DI breaks.</exception>
-    public AntiXssMiddleware(RequestDelegate next)
-    {
-        this._next = next ?? throw new ArgumentNullException(nameof(next));
-    }
 
     public async Task InvokeAsync(HttpContext context)
     {

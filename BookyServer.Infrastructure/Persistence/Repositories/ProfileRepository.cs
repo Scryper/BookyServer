@@ -1,6 +1,7 @@
 using BookyServer.Domain.Entities;
 using BookyServer.Infrastructure.Persistence;
 using BookyServer.Interfaces.Repositories;
+
 using Microsoft.EntityFrameworkCore;
 
 namespace BookyServer.Infrastructure.Persistence.Repositories;

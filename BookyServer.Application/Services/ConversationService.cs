@@ -6,28 +6,24 @@ using BookyServer.Interfaces.Services;
 
 namespace BookyServer.Application.Services;
 
-public sealed class ConversationService(IConversationRepository conversations) : IConversationService
+public sealed class ConversationService(IConversationRepository conversationRepository) : IConversationService
 {
-    private readonly IConversationRepository _conversations =
-        conversations ?? throw new ArgumentNullException(nameof(conversations));
+    private readonly IConversationRepository _conversationRepository = conversationRepository ?? throw new ArgumentNullException(nameof(conversationRepository));
 
-    public async Task<IReadOnlyList<ConversationMessageDto>?> GetMessagesAsync(
-        Guid groupId, Guid userId, int limit, CancellationToken cancellationToken)
+    public async Task<IReadOnlyList<ConversationMessageDto>?> GetMessagesAsync(Guid groupId, Guid userId, int limit, CancellationToken cancellationToken)
     {
-        if (!await this._conversations.IsMemberAsync(groupId, userId, cancellationToken))
+        if (!await this._conversationRepository.IsMemberAsync(groupId, userId, cancellationToken))
         {
             return null;
         }
 
-        var messages = await this._conversations.GetMessagesAsync(
-            groupId, Math.Clamp(limit, 1, 100), cancellationToken);
+        var messages = await this._conversationRepository.GetMessagesAsync(groupId, Math.Clamp(limit, 1, 100), cancellationToken);
         return messages.Select(ConversationMessageMapper.Map).ToArray();
     }
 
-    public async Task<ConversationMessageDto?> SendAsync(
-        Guid groupId, Guid userId, string text, CancellationToken cancellationToken)
+    public async Task<ConversationMessageDto?> SendAsync(Guid groupId, Guid userId, string text, CancellationToken cancellationToken)
     {
-        if (!await this._conversations.IsMemberAsync(groupId, userId, cancellationToken))
+        if (!await this._conversationRepository.IsMemberAsync(groupId, userId, cancellationToken))
         {
             return null;
         }
@@ -46,7 +42,7 @@ public sealed class ConversationService(IConversationRepository conversations) :
             Text = normalized,
             CreatedAt = DateTimeOffset.UtcNow
         };
-        await this._conversations.AddMessageAsync(message, cancellationToken);
+        await this._conversationRepository.AddMessageAsync(message, cancellationToken);
         return ConversationMessageMapper.Map(message);
     }
 }

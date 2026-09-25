@@ -1,5 +1,6 @@
 using BookyServer.Domain.Entities;
 using BookyServer.Infrastructure;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

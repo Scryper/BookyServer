@@ -1,6 +1,7 @@
 using BookyServer.Domain.Entities;
 using BookyServer.Infrastructure;
 using BookyServer.Infrastructure.Identity;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -12,8 +13,10 @@ internal sealed class GroupMembershipConfiguration : IEntityTypeConfiguration<Gr
     {
         builder.ToTable(Constants.Database.GroupMembershipsTable);
         builder.HasKey(member => new { member.GroupId, member.UserId });
-        builder.HasOne<BookyUser>().WithMany().HasForeignKey(member => member.UserId)
-            .OnDelete(DeleteBehavior.NoAction);
+        builder.HasOne<BookyUser>()
+               .WithMany()
+               .HasForeignKey(member => member.UserId)
+               .OnDelete(DeleteBehavior.NoAction);
         builder.HasIndex(member => member.UserId);
     }
 }

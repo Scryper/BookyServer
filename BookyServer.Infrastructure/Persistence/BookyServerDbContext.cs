@@ -1,18 +1,16 @@
 using BookyServer.Domain.Entities;
 using BookyServer.Infrastructure.Identity;
+
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace BookyServer.Infrastructure.Persistence;
 
-public sealed class BookyServerDbContext : IdentityDbContext<BookyUser, IdentityRole<Guid>, Guid>
+public sealed class BookyServerDbContext(DbContextOptions<BookyServerDbContext> options)
+    : IdentityDbContext<BookyUser, IdentityRole<Guid>, Guid>(
+        options ?? throw new ArgumentNullException(nameof(options)))
 {
-    public BookyServerDbContext(DbContextOptions<BookyServerDbContext> options)
-        : base(options ?? throw new ArgumentNullException(nameof(options)))
-    {
-    }
-
     public DbSet<Profile> Profiles => this.Set<Profile>();
     public DbSet<ProfileInterest> ProfileInterests => this.Set<ProfileInterest>();
     public DbSet<ProfilePhoto> ProfilePhotos => this.Set<ProfilePhoto>();

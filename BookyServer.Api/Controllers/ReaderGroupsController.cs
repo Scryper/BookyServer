@@ -1,6 +1,7 @@
 using BookyServer.Infrastructure.Identity;
 using BookyServer.Interfaces.Contracts;
 using BookyServer.Interfaces.Services;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;

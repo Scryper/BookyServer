@@ -3,19 +3,9 @@ namespace BookyServer.Api.Middlewares;
 /// <summary>
 /// Middleware that adds response-security headers.
 /// </summary>
-public sealed class CspMiddleware
+public sealed class CspMiddleware(RequestDelegate next)
 {
-    private readonly RequestDelegate _next;
-
-    /// <summary>
-    /// Initializes a new instance of <see cref="CspMiddleware"/>.
-    /// </summary>
-    /// <param name="next">The next request delegate.</param>
-    /// <exception cref="ArgumentNullException">Thrown when the dependency is null.</exception>
-    public CspMiddleware(RequestDelegate next)
-    {
-        this._next = next ?? throw new ArgumentNullException(nameof(next));
-    }
+    private readonly RequestDelegate _next = next ?? throw new ArgumentNullException(nameof(next));
 
     public async Task InvokeAsync(HttpContext context)
     {

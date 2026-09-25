@@ -1,5 +1,6 @@
 using BookyServer.Application.Services;
 using BookyServer.Interfaces.Services;
+
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BookyServer.Application;

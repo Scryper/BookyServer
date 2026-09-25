@@ -6,22 +6,12 @@ namespace BookyServer.Api.Middlewares;
 /// <summary>
 /// Middleware that handles unhandled application exceptions.
 /// </summary>
-public sealed class ExceptionHandlerMiddleware
+public sealed class ExceptionHandlerMiddleware(
+    RequestDelegate next,
+    ILogger<ExceptionHandlerMiddleware> logger)
 {
-    private readonly RequestDelegate _next;
-    private readonly ILogger<ExceptionHandlerMiddleware> _logger;
-
-    /// <summary>
-    /// Initializes a new instance of <see cref="ExceptionHandlerMiddleware"/>.
-    /// </summary>
-    /// <param name="next">The next request delegate.</param>
-    /// <param name="logger">The logger.</param>
-    /// <exception cref="ArgumentNullException">Thrown when a dependency is null.</exception>
-    public ExceptionHandlerMiddleware(RequestDelegate next, ILogger<ExceptionHandlerMiddleware> logger)
-    {
-        this._next = next ?? throw new ArgumentNullException(nameof(next));
-        this._logger = logger ?? throw new ArgumentNullException(nameof(logger));
-    }
+    private readonly RequestDelegate _next = next ?? throw new ArgumentNullException(nameof(next));
+    private readonly ILogger<ExceptionHandlerMiddleware> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
     /// <summary>
     /// Handles the request and writes an error response for unhandled exceptions.

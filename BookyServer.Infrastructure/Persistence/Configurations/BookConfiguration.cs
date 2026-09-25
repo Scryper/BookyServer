@@ -1,5 +1,6 @@
 using BookyServer.Domain.Entities;
 using BookyServer.Infrastructure;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -20,7 +21,8 @@ internal sealed class BookConfiguration : IEntityTypeConfiguration<Book>
         builder.Property(book => book.Source).HasMaxLength(80);
         builder.Property(book => book.ExternalId).HasMaxLength(200);
         builder.HasIndex(book => book.Isbn13).IsUnique().HasFilter(Constants.Database.BookIsbnFilter);
-        builder.HasIndex(book => new { book.Source, book.ExternalId }).IsUnique()
-            .HasFilter(Constants.Database.BookSourceAndExternalIdFilter);
+        builder.HasIndex(book => new { book.Source, book.ExternalId })
+               .IsUnique()
+               .HasFilter(Constants.Database.BookSourceAndExternalIdFilter);
     }
 }

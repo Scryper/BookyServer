@@ -1,9 +1,10 @@
-using ApiConstants = BookyServer.Api.Constants;
 using BookyServer.Api.Middlewares;
 using BookyServer.Application;
 using BookyServer.Infrastructure;
 using BookyServer.Infrastructure.Identity;
 using BookyServer.Infrastructure.Persistence;
+
+using ApiConstants = BookyServer.Api.Constants;
 
 var builder = WebApplication.CreateBuilder(args);
 
