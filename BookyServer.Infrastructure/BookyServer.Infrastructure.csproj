@@ -5,7 +5,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
-    <ProjectReference Include="../BookyServer.Domain/BookyServer.Domain.csproj" />
-    <ProjectReference Include="../BookyServer.Interfaces/BookyServer.Interfaces.csproj" />
+    <ProjectReference Include="..\BookyServer.Domain\BookyServer.Domain.csproj" />
+    <ProjectReference Include="..\BookyServer.Interfaces\BookyServer.Interfaces.csproj" />
   </ItemGroup>
 </Project>

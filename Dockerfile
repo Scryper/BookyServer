@@ -3,16 +3,16 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0 AS restore
 WORKDIR /src
 
 COPY Directory.Build.props Directory.Packages.props BookyServer.sln ./
-COPY src/BookyServer.Api/BookyServer.Api.csproj src/BookyServer.Api/
-COPY src/BookyServer.Application/BookyServer.Application.csproj src/BookyServer.Application/
-COPY src/BookyServer.Interfaces/BookyServer.Interfaces.csproj src/BookyServer.Interfaces/
-COPY src/BookyServer.Infrastructure/BookyServer.Infrastructure.csproj src/BookyServer.Infrastructure/
-COPY src/BookyServer.Domain/BookyServer.Domain.csproj src/BookyServer.Domain/
+COPY BookyServer.Api/BookyServer.Api.csproj BookyServer.Api/
+COPY BookyServer.Application/BookyServer.Application.csproj BookyServer.Application/
+COPY BookyServer.Interfaces/BookyServer.Interfaces.csproj BookyServer.Interfaces/
+COPY BookyServer.Infrastructure/BookyServer.Infrastructure.csproj BookyServer.Infrastructure/
+COPY BookyServer.Domain/BookyServer.Domain.csproj BookyServer.Domain/
 RUN --mount=type=cache,target=/root/.nuget/packages dotnet restore BookyServer.sln
 
 FROM restore AS publish
-COPY src/ src/
-RUN --mount=type=cache,target=/root/.nuget/packages dotnet publish src/BookyServer.Api/BookyServer.Api.csproj \
+COPY . .
+RUN --mount=type=cache,target=/root/.nuget/packages dotnet publish BookyServer.Api/BookyServer.Api.csproj \
     --configuration Release --no-restore --output /app/publish \
     /p:UseAppHost=false
 

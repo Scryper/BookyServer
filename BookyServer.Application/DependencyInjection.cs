@@ -12,6 +12,7 @@ public static class DependencyInjection
         services.AddScoped<IReaderGroupService, ReaderGroupService>();
         services.AddScoped<IMapMarkerService, MapMarkerService>();
         services.AddScoped<IConversationService, ConversationService>();
+
         return services;
     }
 }

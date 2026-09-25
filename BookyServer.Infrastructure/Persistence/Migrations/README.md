@@ -4,8 +4,8 @@ Générer la migration initiale après avoir configuré le SDK .NET 10 et la con
 
 ```bash
 dotnet ef migrations add InitialCreate \
-  --project src/BookyServer.Infrastructure \
-  --startup-project src/BookyServer.Api \
+  --project BookyServer.Infrastructure \
+  --startup-project BookyServer.Api \
   --output-dir Persistence/Migrations
 ```
 

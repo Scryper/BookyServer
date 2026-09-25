@@ -67,7 +67,7 @@ Prérequis : SDK .NET 10 et Docker Compose.
    docker compose up --build
    ```
 
-L'API écoute sur `http://localhost:8080`, OpenAPI en développement sur `/openapi/v1.json`, et les sondes sur `/health/live` et `/health/ready`.
+L'API écoute sur `http://localhost:8081`, OpenAPI en développement sur `/openapi/v1.json`, et les sondes sur `/health/live` et `/health/ready`.
 
 ## Configuration à compléter
 

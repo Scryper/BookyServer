@@ -1,11 +1,8 @@
+using BookyServer.Api.Middlewares;
 using BookyServer.Application;
 using BookyServer.Infrastructure;
 using BookyServer.Infrastructure.Identity;
 using BookyServer.Infrastructure.Persistence;
-using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using System.Net;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +10,7 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddProblemDetails();
 builder.Services.AddCors();
+
 builder.Services.AddBookyApplication();
 builder.Services.AddBookyInfrastructure(builder.Configuration);
 
@@ -23,8 +21,7 @@ builder.Services.AddIdentityApiEndpoints<BookyUser>(options =>
         options.Password.RequireDigit = true;
         options.Password.RequireUppercase = true;
         options.Password.RequireNonAlphanumeric = true;
-        options.SignIn.RequireConfirmedEmail = builder.Configuration.GetValue(
-            "Authentication:RequireConfirmedEmail", false);
+        options.SignIn.RequireConfirmedEmail = builder.Configuration.GetValue("Authentication:RequireConfirmedEmail", false);
     })
     .AddEntityFrameworkStores<BookyServerDbContext>();
 
@@ -40,8 +37,7 @@ builder.Services.AddAuthorizationBuilder()
     .AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
 
 var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
-if (allowedOrigins.Length > 0 && allowedOrigins.All(origin =>
-        !origin.StartsWith("TODO", StringComparison.OrdinalIgnoreCase)))
+if (allowedOrigins.Length > 0)
 {
     builder.Services.AddCors(options => options.AddDefaultPolicy(policy =>
         policy.WithOrigins(allowedOrigins).AllowAnyHeader().AllowAnyMethod().AllowCredentials()));
@@ -49,22 +45,13 @@ if (allowedOrigins.Length > 0 && allowedOrigins.All(origin =>
 
 var app = builder.Build();
 
-var forwardedHeaders = new ForwardedHeadersOptions
-{
-    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-};
-foreach (var address in builder.Configuration.GetSection("ReverseProxy:KnownProxies").Get<string[]>() ?? [])
-{
-    if (IPAddress.TryParse(address, out var proxyAddress))
-    {
-        forwardedHeaders.KnownProxies.Add(proxyAddress);
-    }
-}
-app.UseForwardedHeaders(forwardedHeaders);
-
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/openapi/v1.json", "BookyServer API v1");
+    });
 }
 else
 {
@@ -77,8 +64,14 @@ if (!app.Environment.IsDevelopment())
     app.UseHttpsRedirection();
 }
 app.UseCors();
+
+app.UseMiddleware<CspMiddleware>();
+
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseMiddleware<ExceptionHandlerMiddleware>();
+app.UseMiddleware<AntiXssMiddleware>();
 
 app.MapGroup("/api/v1/auth").MapIdentityApi<BookyUser>();
 app.MapControllers();
@@ -95,7 +88,3 @@ app.MapGet("/health/ready", async (BookyServerDbContext db, CancellationToken ca
 }).AllowAnonymous();
 
 app.Run();
-
-public partial class Program
-{
-}
