@@ -7,6 +7,3 @@ public sealed record ReaderGroupDto(
     string? City,
     int MemberCount,
     int MaxMembers);
-
-public sealed record ReaderGroupMemberDto(Guid UserId, string? DisplayName, DateTimeOffset JoinedAt);
-public sealed record JoinGroupResult(bool Joined, bool IsFull);

@@ -9,9 +9,3 @@ public sealed class ProfilePhoto
     public int SortOrder { get; set; }
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
 }
-
-public enum PhotoCategory
-{
-    Portrait = 1,
-    Library = 2
-}

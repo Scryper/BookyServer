@@ -6,5 +6,3 @@ public sealed record ConversationMessageDto(
     Guid AuthorUserId,
     string Text,
     DateTimeOffset CreatedAt);
-
-public sealed record SendConversationMessageRequest(string Text);
