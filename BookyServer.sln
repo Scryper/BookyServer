@@ -1,0 +1,42 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BookyServer.Api", "src\BookyServer.Api\BookyServer.Api.csproj", "{10101010-1010-4010-8010-101010101010}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BookyServer.Interfaces", "src\BookyServer.Interfaces\BookyServer.Interfaces.csproj", "{20202020-2020-4020-8020-202020202020}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BookyServer.Application", "src\BookyServer.Application\BookyServer.Application.csproj", "{30303030-3030-4030-8030-303030303030}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BookyServer.Infrastructure", "src\BookyServer.Infrastructure\BookyServer.Infrastructure.csproj", "{40404040-4040-4040-8040-404040404040}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BookyServer.Domain", "src\BookyServer.Domain\BookyServer.Domain.csproj", "{50505050-5050-4050-8050-505050505050}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{10101010-1010-4010-8010-101010101010}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{10101010-1010-4010-8010-101010101010}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{10101010-1010-4010-8010-101010101010}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{10101010-1010-4010-8010-101010101010}.Release|Any CPU.Build.0 = Release|Any CPU
+		{20202020-2020-4020-8020-202020202020}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{20202020-2020-4020-8020-202020202020}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{20202020-2020-4020-8020-202020202020}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{20202020-2020-4020-8020-202020202020}.Release|Any CPU.Build.0 = Release|Any CPU
+		{30303030-3030-4030-8030-303030303030}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{30303030-3030-4030-8030-303030303030}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{30303030-3030-4030-8030-303030303030}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{30303030-3030-4030-8030-303030303030}.Release|Any CPU.Build.0 = Release|Any CPU
+		{40404040-4040-4040-8040-404040404040}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{40404040-4040-4040-8040-404040404040}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{40404040-4040-4040-8040-404040404040}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{40404040-4040-4040-8040-404040404040}.Release|Any CPU.Build.0 = Release|Any CPU
+		{50505050-5050-4050-8050-505050505050}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{50505050-5050-4050-8050-505050505050}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{50505050-5050-4050-8050-505050505050}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{50505050-5050-4050-8050-505050505050}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

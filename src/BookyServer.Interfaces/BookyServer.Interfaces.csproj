@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="../BookyServer.Domain/BookyServer.Domain.csproj" />
+  </ItemGroup>
+</Project>
