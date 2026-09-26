@@ -18,7 +18,7 @@ API REST ASP.NET Core pour Booky, l'application de rencontre entre lecteurs.
 - `BookyServer.Infrastructure` : EF Core, SQL Server, configurations et migrations.
 - `BookyServer.Domain` : entités persistées et règles du domaine.
 
-Le stockage SQL Server est géré avec EF Core. L'authentification HTTP utilise les endpoints ASP.NET Core Identity API. OpenAPI est disponible en développement. Le déploiement cible des conteneurs Docker sur Infomaniak.
+Le stockage SQL Server est géré avec EF Core. L'authentification HTTP utilise Google OAuth et un cookie ASP.NET Core Identity. OpenAPI est disponible en développement. Le déploiement cible des conteneurs Docker sur Infomaniak.
 
 ## Démarrage
 
@@ -72,19 +72,18 @@ L'API écoute sur `http://localhost:8081`, OpenAPI en développement sur `/opena
 ## Configuration à compléter
 
 - `ConnectionStrings:BookyDatabase` : chaîne SQL Server locale ou Infomaniak.
-- `Authentication:RequireConfirmedEmail` et l'expéditeur/transport mail : à définir avant toute inscription publique.
+- `Authentication__Google__ClientId` et `Authentication__Google__ClientSecret` : identifiants OAuth Google, à fournir via les variables d'environnement ou les secrets utilisateur. Enregistrer `https://{domaine-api}/signin-google` comme URI de redirection autorisée dans Google Cloud.
 - `Cors:AllowedOrigins` : origines exactes du site Next.js.
 - `MediaStorage` : fournisseur, bucket, endpoint, identifiants et politique d'accès.
 - SMTP, journaux, sauvegardes, limites d'upload, clé de protection des cookies et politique d'administration.
 - Secrets Docker/CI et règles de pare-feu : gestion manuelle dans l'environnement de déploiement Infomaniak.
-- Cette première initialisation n'implémente pas encore l'envoi des emails de confirmation. `RequireConfirmedEmail` reste désactivé en développement ; intégrer et tester un expéditeur SMTP avant toute inscription publique.
 - Créer/attribuer le rôle `Admin` hors API avant d'autoriser la création de marqueurs ; aucun compte n'est administrateur par défaut.
 
 Les placeholders `TODO` ne sont pas des secrets fonctionnels. Configurer les variables d'environnement hors du dépôt pour tout déploiement réel.
 
 ## Endpoints initiaux
 
-- `POST /api/v1/auth/register`, `POST /api/v1/auth/login`, `POST /api/v1/auth/refresh`, `POST /api/v1/auth/logout` : endpoints Identity.
+- `GET /api/v1/auth/google` : démarre l'authentification Google. `GET /api/v1/auth/google/callback` crée ou connecte le compte Identity associé, puis établit le cookie de session.
 - `GET /api/v1/profiles/me`, `PUT /api/v1/profiles/me`, `GET /api/v1/profiles/{id}`.
 - `GET /api/v1/books?query=...`, `PUT /api/v1/profiles/me/books/{bookId}`.
 - `GET /api/v1/groups`, `GET /api/v1/groups/{id}/members`, `POST` et `DELETE /api/v1/groups/{id}/join`.

@@ -4,6 +4,9 @@ using BookyServer.Infrastructure;
 using BookyServer.Infrastructure.Identity;
 using BookyServer.Infrastructure.Persistence;
 
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Identity;
+
 using ApiConstants = BookyServer.Api.Constants;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,18 +19,33 @@ builder.Services.AddCors();
 builder.Services.AddBookyApplication();
 builder.Services.AddBookyInfrastructure(builder.Configuration);
 
-builder.Services.AddIdentityApiEndpoints<BookyUser>(options =>
+builder.Services.AddIdentityCore<BookyUser>(options =>
     {
         options.User.RequireUniqueEmail = true;
-        options.Password.RequiredLength = 12;
-        options.Password.RequireDigit = true;
-        options.Password.RequireUppercase = true;
-        options.Password.RequireNonAlphanumeric = true;
-        options.SignIn.RequireConfirmedEmail = builder.Configuration.GetValue(
-            ApiConstants.Configuration.RequireConfirmedEmail,
-            false);
     })
-    .AddEntityFrameworkStores<BookyServerDbContext>();
+    .AddRoles<IdentityRole<Guid>>()
+    .AddEntityFrameworkStores<BookyServerDbContext>()
+    .AddSignInManager();
+
+var authentication = builder.Services.AddAuthentication(options =>
+{
+    options.DefaultScheme = IdentityConstants.ApplicationScheme;
+    options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
+});
+authentication.AddIdentityCookies();
+
+var googleClientId = builder.Configuration[ApiConstants.Configuration.GoogleClientId];
+var googleClientSecret = builder.Configuration[ApiConstants.Configuration.GoogleClientSecret];
+if (!string.IsNullOrWhiteSpace(googleClientId) && !string.IsNullOrWhiteSpace(googleClientSecret))
+{
+    authentication.AddGoogle(options =>
+    {
+        options.ClientId = googleClientId;
+        options.ClientSecret = googleClientSecret;
+        options.SaveTokens = false;
+        options.SignInScheme = IdentityConstants.ExternalScheme;
+    });
+}
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
@@ -78,7 +96,6 @@ app.UseAuthorization();
 app.UseMiddleware<ExceptionHandlerMiddleware>();
 app.UseMiddleware<AntiXssMiddleware>();
 
-app.MapGroup("/api/v1/auth").MapIdentityApi<BookyUser>();
 app.MapControllers();
 
 app.MapGet("/health/live", () =>

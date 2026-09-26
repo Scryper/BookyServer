@@ -10,7 +10,8 @@ public static class Constants
 
     public static class Configuration
     {
-        public const string RequireConfirmedEmail = "Authentication:RequireConfirmedEmail";
+        public const string GoogleClientId = "Authentication:Google:ClientId";
+        public const string GoogleClientSecret = "Authentication:Google:ClientSecret";
         public const string AllowedCorsOrigins = "Cors:AllowedOrigins";
     }
 
@@ -28,6 +29,9 @@ public static class Constants
         public const string InvalidCurrentUser = "L'identifiant utilisateur de la session est invalide.";
         public const string ReaderGroupAtCapacity = "Le groupe a atteint sa capacité maximale.";
         public const string AntiXss = "Error from AntiXssMiddleware";
+        public const string GoogleAuthenticationFailed = "L'authentification Google a échoué.";
+        public const string GoogleAuthenticationUnavailable = "L'authentification Google n'est pas configurée.";
+        public const string GoogleEmailMissing = "Le compte Google ne fournit pas d'adresse e-mail.";
     }
 
 }
