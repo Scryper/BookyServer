@@ -10,7 +10,7 @@ namespace BookyServer.Api.Controllers;
 
 [ApiController]
 [Authorize]
-[Route(Constants.Routes.ReaderGroups)]
+[Route("api/v1/groups")]
 public sealed class ReaderGroupsController(
     IReaderGroupService groups,
     UserManager<BookyUser> userManager) : ControllerBase
@@ -25,7 +25,7 @@ public sealed class ReaderGroupsController(
         return Ok(await this._groups.GetActiveAsync(cancellationToken));
     }
 
-    [HttpGet(Constants.Routes.ReaderGroupMembers)]
+    [HttpGet("{groupId:guid}/members")]
     [ProducesResponseType<IReadOnlyList<ReaderGroupMemberDto>>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetMembersAsync(Guid groupId, CancellationToken cancellationToken)
@@ -34,7 +34,7 @@ public sealed class ReaderGroupsController(
         return members is null ? NotFound() : Ok(members);
     }
 
-    [HttpPost(Constants.Routes.ReaderGroupJoin)]
+    [HttpPost("{groupId:guid}/join")]
     [ProducesResponseType<JoinGroupResult>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
@@ -52,7 +52,7 @@ public sealed class ReaderGroupsController(
             : Ok(result);
     }
 
-    [HttpDelete(Constants.Routes.ReaderGroupJoin)]
+    [HttpDelete("{groupId:guid}/join")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> LeaveAsync(Guid groupId, CancellationToken cancellationToken)

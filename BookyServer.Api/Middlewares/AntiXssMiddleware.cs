@@ -46,7 +46,7 @@ public sealed class AntiXssMiddleware(RequestDelegate next)
         {
             var content = await ReadRequestBodyAsync(context);
 
-            if (!content.Contains(Constants.Requests.FormDataContentDisposition, StringComparison.Ordinal) &&
+            if (!content.Contains("Content-Disposition: form-data", StringComparison.Ordinal) &&
                 CrossSiteScriptingValidation.IsDangerousString(content, out _))
             {
                 await this.RespondWithAnErrorAsync(context);
@@ -80,7 +80,7 @@ public sealed class AntiXssMiddleware(RequestDelegate next)
     {
         context.Response.Clear();
         context.Response.Headers.AddHeaders();
-        context.Response.ContentType = Constants.ResponseContentTypes.Utf8Json;
+        context.Response.ContentType = "application/json; charset=utf-8";
         context.Response.StatusCode = BadRequestStatusCode;
 
         var error = new ErrorResponse

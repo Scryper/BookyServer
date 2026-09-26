@@ -26,11 +26,11 @@ public sealed class ExceptionHandlerMiddleware(
         catch (Exception error)
         {
             var response = context.Response;
-            response.ContentType = Constants.ResponseContentTypes.Json;
+            response.ContentType = "application/json";
             response.StatusCode = (int)HttpStatusCode.InternalServerError;
 
             var result = JsonSerializer.Serialize(new { message = error.Message });
-            this._logger.LogError(Constants.Logging.UnhandledException, error.Message, error.StackTrace);
+            ExceptionHandlerLog.UnhandledException(this._logger, error);
             await response.WriteAsync(result);
         }
     }

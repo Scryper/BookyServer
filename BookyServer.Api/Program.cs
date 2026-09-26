@@ -55,7 +55,7 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
     app.UseSwaggerUI(options =>
     {
-        options.SwaggerEndpoint(ApiConstants.OpenApi.Endpoint, ApiConstants.OpenApi.Title);
+        options.SwaggerEndpoint("/openapi/v1.json", "BookyServer API v1");
     });
 }
 else
@@ -78,22 +78,22 @@ app.UseAuthorization();
 app.UseMiddleware<ExceptionHandlerMiddleware>();
 app.UseMiddleware<AntiXssMiddleware>();
 
-app.MapGroup(ApiConstants.Routes.Authentication).MapIdentityApi<BookyUser>();
+app.MapGroup("/api/v1/auth").MapIdentityApi<BookyUser>();
 app.MapControllers();
 
-app.MapGet(ApiConstants.Routes.HealthLive, () =>
+app.MapGet("/health/live", () =>
     {
-        return Results.Ok(new { status = ApiConstants.Statuses.Live });
+        return Results.Ok(new { status = "live" });
     })
     .AllowAnonymous();
 
 app.MapGet(
-        ApiConstants.Routes.HealthReady,
+        "/health/ready",
         async (BookyServerDbContext db, CancellationToken cancellationToken) =>
         {
             var canConnect = await db.Database.CanConnectAsync(cancellationToken);
             return canConnect
-                ? Results.Ok(new { status = ApiConstants.Statuses.Ready })
+                ? Results.Ok(new { status = "ready" })
                 : Results.StatusCode(StatusCodes.Status503ServiceUnavailable);
         })
     .AllowAnonymous();

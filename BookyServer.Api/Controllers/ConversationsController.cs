@@ -10,7 +10,7 @@ namespace BookyServer.Api.Controllers;
 
 [ApiController]
 [Authorize]
-[Route(Constants.Routes.Conversations)]
+[Route("api/v1/groups/{groupId:guid}/messages")]
 public sealed class ConversationsController(
     IConversationService conversationService,
     UserManager<BookyUser> userManager) : ControllerBase

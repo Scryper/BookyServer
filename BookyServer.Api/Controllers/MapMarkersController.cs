@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace BookyServer.Api.Controllers;
 
 [ApiController]
-[Route(Constants.Routes.MapMarkers)]
+[Route("api/v1/map-markers")]
 public sealed class MapMarkersController(IMapMarkerService markers) : ControllerBase
 {
     private readonly IMapMarkerService _markers = markers ?? throw new ArgumentNullException(nameof(markers));
@@ -30,7 +30,7 @@ public sealed class MapMarkersController(IMapMarkerService markers) : Controller
         try
         {
             var marker = await this._markers.CreateAsync(request, cancellationToken);
-            return Created(Constants.Routes.MapMarkersPath, marker);
+            return Created("/api/v1/map-markers", marker);
         }
         catch (ArgumentException exception)
         {

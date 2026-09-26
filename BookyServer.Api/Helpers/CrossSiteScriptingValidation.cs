@@ -56,9 +56,9 @@ public static class CrossSiteScriptingValidation
 
     public static void AddHeaders(this IHeaderDictionary headers)
     {
-        if (headers[Constants.Headers.P3P].IsNullOrEmpty())
+        if (headers["P3P"].IsNullOrEmpty())
         {
-            headers.Append(Constants.Headers.P3P, Constants.Headers.P3PValue);
+            headers.Append("P3P", "CP=\"IDC DSP COR ADM DEVi TAIi PSA PSD IVAi IVDi CONi HIS OUR IND CNT\"");
         }
     }
 

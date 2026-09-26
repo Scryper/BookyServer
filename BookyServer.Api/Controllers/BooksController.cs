@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace BookyServer.Api.Controllers;
 
 [ApiController]
-[Route(Constants.Routes.Books)]
+[Route("api/v1/books")]
 public sealed class BooksController(IProfileService profiles) : ControllerBase
 {
     private readonly IProfileService _profiles = profiles ?? throw new ArgumentNullException(nameof(profiles));

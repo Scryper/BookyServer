@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace BookyServer.Api.Controllers;
 
 [ApiController]
-[Route(Constants.Routes.Profiles)]
+[Route("api/v1/profiles")]
 public sealed class ProfilesController(
     IProfileService profiles,
     UserManager<BookyUser> userManager) : ControllerBase
@@ -19,7 +19,7 @@ public sealed class ProfilesController(
     private readonly IProfileService _profiles = profiles ?? throw new ArgumentNullException(nameof(profiles));
     private readonly UserManager<BookyUser> _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
 
-    [HttpGet(Constants.Routes.CurrentProfile)]
+    [HttpGet("me")]
     [Authorize]
     [ProducesResponseType<ProfileDto>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -30,7 +30,7 @@ public sealed class ProfilesController(
         return profile is null ? NotFound() : Ok(profile);
     }
 
-    [HttpPut(Constants.Routes.CurrentProfile)]
+    [HttpPut("me")]
     [Authorize]
     [ProducesResponseType<ProfileDto>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -53,7 +53,7 @@ public sealed class ProfilesController(
         }
     }
 
-    [HttpPut(Constants.Routes.ProfileBook)]
+    [HttpPut("me/books/{bookId:guid}")]
     [Authorize]
     [ProducesResponseType<ProfileBookDto>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -78,7 +78,7 @@ public sealed class ProfilesController(
         }
     }
 
-    [HttpGet(Constants.Routes.ProfileById)]
+    [HttpGet("{id:guid}")]
     [AllowAnonymous]
     [ProducesResponseType<ProfileDto>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
