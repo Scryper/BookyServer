@@ -82,10 +82,7 @@ else
     app.UseHsts();
 }
 
-if (!app.Environment.IsDevelopment())
-{
-    app.UseHttpsRedirection();
-}
+app.UseHttpsRedirection();
 app.UseCors();
 
 app.UseMiddleware<CspMiddleware>();
@@ -98,11 +95,7 @@ app.UseMiddleware<AntiXssMiddleware>();
 
 app.MapControllers();
 
-app.MapGet("/health/live", () =>
-    {
-        return Results.Ok(new { status = "live" });
-    })
-    .AllowAnonymous();
+app.MapGet("/health/live", () => Results.Ok(new { status = "live" })).AllowAnonymous();
 
 app.MapGet(
         "/health/ready",

@@ -24,15 +24,23 @@ Le stockage SQL Server est géré avec EF Core. L'authentification HTTP utilise 
 
 Prérequis : SDK .NET 10 et Docker Compose.
 
-1. Remplacer les valeurs `TODO` et ne pas committer de secrets.
-2. Définir un mot de passe local SQL Server :
+1. Copier `.env.example` vers `.env`, remplacer les valeurs `TODO` et ne pas committer de secrets.
+2. Créer et approuver le certificat de développement HTTPS. Le mot de passe doit correspondre à `BOOKYSERVER_HTTPS_CERTIFICATE_PASSWORD` dans `.env` :
+
+   ```powershell
+   New-Item -ItemType Directory -Force "$env:USERPROFILE\.aspnet\https"
+   dotnet dev-certs https --trust
+   dotnet dev-certs https -ep "$env:USERPROFILE\.aspnet\https\bookyserver.pfx" -p '<BOOKYSERVER_HTTPS_CERTIFICATE_PASSWORD>'
+   ```
+
+3. Définir un mot de passe local SQL Server :
 
    ```bash
    export MSSQL_SA_PASSWORD='TODO_Replace_With_A_Strong_Local_Password_2026!'
    docker compose up -d sqlserver
    ```
 
-3. Créer la base locale (remplacer le secret par celui de l'étape précédente) :
+4. Créer la base locale (remplacer le secret par celui de l'étape précédente) :
 
    ```bash
    docker compose exec sqlserver /opt/mssql-tools18/bin/sqlcmd \
@@ -40,7 +48,7 @@ Prérequis : SDK .NET 10 et Docker Compose.
      -Q "IF DB_ID(N'BookyServer') IS NULL CREATE DATABASE [BookyServer]"
    ```
 
-4. Restaurer, compiler et appliquer la première migration :
+5. Restaurer, compiler et appliquer la première migration :
 
    ```bash
    dotnet restore
@@ -61,13 +69,13 @@ Prérequis : SDK .NET 10 et Docker Compose.
        --startup-project src/BookyServer.Api
    ```
 
-5. Démarrer l'API et SQL Server :
+6. Démarrer l'API et SQL Server :
 
    ```bash
    docker compose up --build
    ```
 
-L'API écoute sur `http://localhost:8081`, OpenAPI en développement sur `/openapi/v1.json`, et les sondes sur `/health/live` et `/health/ready`.
+L'API écoute sur `https://localhost:8081`, OpenAPI en développement sur `/openapi/v1.json`, et les sondes sur `/health/live` et `/health/ready`.
 
 ## Configuration à compléter
 

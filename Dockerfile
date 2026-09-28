@@ -18,9 +18,10 @@ RUN --mount=type=cache,target=/root/.nuget/packages dotnet publish BookyServer.A
 
 FROM mcr.microsoft.com/dotnet/aspnet:10.0-noble-chiseled-extra AS final
 WORKDIR /app
-ENV ASPNETCORE_HTTP_PORTS=8080 \
+ENV ASPNETCORE_URLS=https://+:8081 \
+    ASPNETCORE_HTTPS_PORT=8081 \
     DOTNET_EnableDiagnostics=0
-EXPOSE 8080
+EXPOSE 8081
 COPY --from=publish --chown=$APP_UID:$APP_UID /app/publish .
 USER $APP_UID
 ENTRYPOINT ["dotnet", "BookyServer.Api.dll"]
