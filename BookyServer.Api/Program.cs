@@ -95,17 +95,4 @@ app.UseMiddleware<AntiXssMiddleware>();
 
 app.MapControllers();
 
-app.MapGet("/health/live", () => Results.Ok(new { status = "live" })).AllowAnonymous();
-
-app.MapGet(
-        "/health/ready",
-        async (BookyServerDbContext db, CancellationToken cancellationToken) =>
-        {
-            var canConnect = await db.Database.CanConnectAsync(cancellationToken);
-            return canConnect
-                ? Results.Ok(new { status = "ready" })
-                : Results.StatusCode(StatusCodes.Status503ServiceUnavailable);
-        })
-    .AllowAnonymous();
-
 app.Run();
