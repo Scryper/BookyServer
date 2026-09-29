@@ -92,6 +92,10 @@ Les placeholders `TODO` ne sont pas des secrets fonctionnels. Configurer les var
 ## Endpoints initiaux
 
 - `GET /api/v1/auth/google` : démarre l'authentification Google. `GET /api/v1/auth/google/callback` crée ou connecte le compte Identity associé, puis établit le cookie de session.
+- `GET /api/v1/auth/google/login` : démarre la connexion Google pour un compte Identity déjà associé. `GET /api/v1/auth/google/login/callback` établit le cookie de session ou retourne `401` lorsque le compte Google n'est pas encore associé.
+- Les routes de démarrage Google acceptent `returnUrl` pour revenir vers le frontend après authentification. Son origine doit figurer dans `Cors:AllowedOrigins`.
+- `GET /api/v1/auth/session` : retourne si la session est authentifiée et l'identifiant utilisateur, ou `false` et `null` en mode anonyme.
+- `POST /api/v1/auth/logout` : ferme la session et supprime le cookie d'authentification.
 - `GET /api/v1/profiles/me`, `PUT /api/v1/profiles/me`, `GET /api/v1/profiles/{id}`.
 - `GET /api/v1/books?query=...`, `PUT /api/v1/profiles/me/books/{bookId}`.
 - `GET /api/v1/groups`, `GET /api/v1/groups/{id}/members`, `POST` et `DELETE /api/v1/groups/{id}/join`.
