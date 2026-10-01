@@ -1,0 +1,40 @@
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: Developer
+      MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD:?Set MSSQL_SA_PASSWORD in .env.}
+    ports:
+      - "127.0.0.1:${MSSQL_PORT:-1433}:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -Q \"SELECT 1\" >/dev/null 2>&1"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+      start_period: 30s
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_HTTPS_PORTS: 8081
+      ASPNETCORE_HTTPS_PORT: 8081
+      ASPNETCORE_Kestrel__Certificates__Default__Path: /https/bookyserver.pfx
+      ASPNETCORE_Kestrel__Certificates__Default__Password: ${BOOKYSERVER_HTTPS_CERTIFICATE_PASSWORD:?Set BOOKYSERVER_HTTPS_CERTIFICATE_PASSWORD in .env.}
+      ConnectionStrings__BookyDatabase: "Server=sqlserver,1433;Database=BookyServer;User Id=sa;Password=${MSSQL_SA_PASSWORD:?Set MSSQL_SA_PASSWORD in .env.};Encrypt=True;TrustServerCertificate=True;"
+      Cors__AllowedOrigins__0: ${BOOKY_FRONTEND_ORIGIN:-https://localhost:3000}
+    ports:
+      - "127.0.0.1:${BOOKYSERVER_HTTPS_PORT:-8081}:8081"
+    volumes:
+      - ~/.aspnet/https:/https:ro
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+
+volumes:
+  sqlserver_data:

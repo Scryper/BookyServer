@@ -1,0 +1,30 @@
+name: Build API
+
+on:
+  push:
+    branches: [main, feature/init]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - name: Restore
+        run: dotnet restore BookyServer.sln
+      - name: Build
+        run: dotnet build BookyServer.sln --configuration Release --no-restore
+      - name: Validate Compose configuration
+        env:
+          MSSQL_SA_PASSWORD: CiOnly_Password_123!
+          BOOKYSERVER_HTTPS_CERTIFICATE_PASSWORD: CiOnly_Certificate_Password_123!
+        run: docker compose config --quiet
+      - name: Build production container image
+        run: docker build --tag bookyserver:ci .
