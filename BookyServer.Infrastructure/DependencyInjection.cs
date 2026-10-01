@@ -1,6 +1,4 @@
 using BookyServer.Infrastructure.Persistence;
-using BookyServer.Infrastructure.Persistence.Repositories;
-using BookyServer.Interfaces.Repositories;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -20,10 +18,6 @@ public static class DependencyInjection
             connectionString,
             sql => sql.MigrationsAssembly(typeof(BookyServerDbContext).Assembly.FullName!)));
 
-        services.AddScoped<IProfileRepository, ProfileRepository>();
-        services.AddScoped<IReaderGroupRepository, ReaderGroupRepository>();
-        services.AddScoped<IMapMarkerRepository, MapMarkerRepository>();
-        services.AddScoped<IConversationRepository, ConversationRepository>();
         return services;
     }
 }
