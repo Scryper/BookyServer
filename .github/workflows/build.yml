@@ -22,6 +22,9 @@ jobs:
       - name: Build
         run: dotnet build BookyServer.sln --configuration Release --no-restore
       - name: Validate Compose configuration
+        env:
+          MSSQL_SA_PASSWORD: CiOnly_Password_123!
+          BOOKYSERVER_HTTPS_CERTIFICATE_PASSWORD: CiOnly_Certificate_Password_123!
         run: docker compose config --quiet
       - name: Build production container image
         run: docker build --tag bookyserver:ci .
